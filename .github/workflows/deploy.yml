@@ -1,3 +1,4 @@
+# Trigger deploy 2
 # Simple GitHub Actions workflow for deploying static content to GitHub Pages
 name: Deploy static content to Pages
 
