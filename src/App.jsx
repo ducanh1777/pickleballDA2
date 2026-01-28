@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Cart from './components/Cart';
 import HomePage from './pages/HomePage';
@@ -32,7 +32,7 @@ function App() {
   };
 
   return (
-    <Router basename="/pickleballDA">
+    <Router>
       <ScrollToTop />
       <div className="App">
         <Header
