@@ -68,12 +68,12 @@ const Header = ({ cartCount, onCartClick }) => {
                             Đăng nhập
                         </Link>
                     )}
-                    <button className={`cart-icon ${!isHome && !scrolled ? 'dark' : ''}`} onClick={onCartClick}>
+                    <button className={`cart-icon ${scrolled || !isHome ? 'dark' : ''}`} onClick={onCartClick}>
                         <span>🛒</span>
                         {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
                     </button>
                     <button
-                        className={`hamburger ${!isHome && !scrolled ? 'dark' : ''}`}
+                        className={`hamburger ${scrolled || !isHome ? 'dark' : ''}`}
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         aria-label="Menu"
                     >
