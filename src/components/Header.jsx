@@ -42,11 +42,19 @@ const Header = ({ cartCount, onCartClick }) => {
                         )}
                         <li><Link to="/about" onClick={() => setIsMenuOpen(false)} style={{ color: !isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined }}>Về chúng tôi</Link></li>
                         <li><Link to="/contact" onClick={() => setIsMenuOpen(false)} style={{ color: !isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined }}>Liên hệ</Link></li>
+                        {user && (
+                            <li className="mobile-only"><Link to="/my-orders" onClick={() => setIsMenuOpen(false)}>Đơn hàng của tôi</Link></li>
+                        )}
+                        {user ? (
+                            <li className="mobile-only"><button onClick={handleLogout} style={{ background: 'none', border: 'none', color: 'var(--text-dark)', fontWeight: '600', width: '100%', textAlign: 'left', fontSize: '1.2rem', padding: '0' }}>Thoát</button></li>
+                        ) : (
+                            <li className="mobile-only"><Link to="/login" onClick={() => setIsMenuOpen(false)}>Đăng nhập</Link></li>
+                        )}
                     </ul>
                 </nav>
                 <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     {user ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                        <div className="mobile-hide" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                             <Link to="/my-orders" style={{ fontSize: '0.9rem', fontWeight: '700', color: !isHome && !scrolled ? 'var(--text-dark)' : 'white' }}>
                                 Đơn hàng của tôi
                             </Link>
@@ -63,6 +71,7 @@ const Header = ({ cartCount, onCartClick }) => {
                     ) : (
                         <Link
                             to="/login"
+                            className="mobile-hide"
                             style={{ color: !isHome && !scrolled ? 'var(--text-dark)' : 'white', fontWeight: '700' }}
                         >
                             Đăng nhập
