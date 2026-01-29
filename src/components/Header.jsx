@@ -35,6 +35,16 @@ const Header = ({ cartCount, onCartClick }) => {
                 </Link>
                 <nav className={`nav ${isMenuOpen ? 'open' : ''}`}>
                     <ul className="nav-links">
+                        {user && (
+                            <li className="mobile-only greeting-mobile">
+                                <div style={{ padding: '20px', background: 'rgba(118, 185, 0, 0.1)', borderRadius: '16px', marginBottom: '10px' }}>
+                                    <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', display: 'block' }}>Xin chào,</span>
+                                    <span style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--primary)' }}>
+                                        {user.displayName || user.email.split('@')[0]} 👋
+                                    </span>
+                                </div>
+                            </li>
+                        )}
                         <li><Link to="/" onClick={() => setIsMenuOpen(false)} style={{ color: !isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined }}>Trang chủ</Link></li>
                         <li><Link to="/products" onClick={() => setIsMenuOpen(false)} style={{ color: !isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined }}>Sản phẩm</Link></li>
                         {useAuth().isAdmin && (
@@ -58,9 +68,11 @@ const Header = ({ cartCount, onCartClick }) => {
                             <Link to="/my-orders" style={{ fontSize: '0.9rem', fontWeight: '700', color: !isHome && !scrolled ? 'var(--text-dark)' : 'white' }}>
                                 Đơn hàng của tôi
                             </Link>
-                            <span style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--primary)' }}>
-                                👋 {user.email.split('@')[0]}
-                            </span>
+                            <div className="user-badge" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 14px', background: !isHome && !scrolled ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)', borderRadius: '20px', border: '1px solid currentColor' }}>
+                                <span style={{ fontSize: '0.85rem', fontWeight: '800', color: !isHome && !scrolled ? 'var(--text-dark)' : 'white' }}>
+                                    👋 {user.displayName || user.email.split('@')[0]}
+                                </span>
+                            </div>
                             <button
                                 onClick={handleLogout}
                                 style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontWeight: '600', cursor: 'pointer', fontSize: '0.8rem' }}
