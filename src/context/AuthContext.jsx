@@ -108,10 +108,11 @@ export function AuthProvider({ children }) {
 
         const initializeAuth = async () => {
             addLog("System Init...");
+            addLog("URL: " + window.location.href.split('?')[0].split('#')[0].slice(-20) + "..."); // Shortened URL for log
             setLoading(true);
 
             try {
-                await setPersistence(auth, browserLocalPersistence);
+                // Check for redirect result
                 addLog("Checking Redirect Result...");
                 const result = await getRedirectResult(auth);
                 if (result?.user) {
@@ -119,6 +120,10 @@ export function AuthProvider({ children }) {
                     await saveUserToFirestore(result.user);
                 } else {
                     addLog("No Redirect data found.");
+                    // Check if we have auth params in URL despite getRedirectResult saying no
+                    if (window.location.href.includes('apiKey') || window.location.href.includes('state')) {
+                        addLog("Warning: Auth params found in URL but SDK ignored them!");
+                    }
                 }
             } catch (error) {
                 addLog("Redirect Check Error: " + error.code);
