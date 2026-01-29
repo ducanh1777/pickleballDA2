@@ -66,14 +66,14 @@ const Header = ({ cartCount, onCartClick }) => {
                 <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     {user ? (
                         <div className="mobile-hide" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                            <div className="user-badge" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 14px', background: !isHome && !scrolled ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)', borderRadius: '20px', border: '1px solid currentColor' }}>
-                                <span style={{ fontSize: '0.8rem', fontWeight: '700', color: !isHome && !scrolled ? 'var(--text-dark)' : 'white' }}>
+                            <div className="user-badge" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 14px', background: !isHome && !scrolled ? 'rgba(0,0,0,0.05)' : (scrolled ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)'), borderRadius: '20px', border: scrolled || (!isHome && !scrolled) ? '1px solid var(--text-dark)' : '1px solid white' }}>
+                                <span style={{ fontSize: '0.8rem', fontWeight: '700', color: scrolled || (!isHome && !scrolled) ? 'var(--text-dark)' : 'white' }}>
                                     Hi, {user.displayName?.split(' ').pop() || user.email.split('@')[0]}
                                 </span>
                             </div>
                             <button
                                 onClick={handleLogout}
-                                style={{ background: 'none', border: 'none', color: !isHome && !scrolled ? 'var(--text-muted)' : 'rgba(255,255,255,0.7)', fontWeight: '600', cursor: 'pointer', fontSize: '0.75rem' }}
+                                style={{ background: 'none', border: 'none', color: scrolled || (!isHome && !scrolled) ? 'var(--text-dark)' : 'rgba(255,255,255,0.8)', fontWeight: '600', cursor: 'pointer', fontSize: '0.75rem' }}
                             >
                                 Thoát
                             </button>
