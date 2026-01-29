@@ -674,7 +674,6 @@ footer {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 5px;
   width: 44px;
   height: 44px;
   background: var(--primary) !important;
@@ -684,6 +683,12 @@ footer {
   z-index: 2200;
   padding: 0;
   box-shadow: 0 4px 15px rgba(118, 185, 0, 0.4);
+}
+
+.hamburger svg {
+  width: 32px;
+  height: 32px;
+  display: block;
 }
 
 .hamburger span {
@@ -778,8 +783,16 @@ footer {
     display: none !important;
   }
 
+  .mobile-hide {
+    display: none !important;
+  }
+
   .mobile-only {
     display: block !important;
+  }
+
+  .login-link-header {
+    font-size: 0.85rem;
   }
 
   .header-actions span {

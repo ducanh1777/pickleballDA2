@@ -71,8 +71,8 @@ const Header = ({ cartCount, onCartClick }) => {
                     ) : (
                         <Link
                             to="/login"
-                            className="mobile-hide"
-                            style={{ color: !isHome && !scrolled ? 'var(--text-dark)' : 'white', fontWeight: '700' }}
+                            className="login-link-header"
+                            style={{ color: !isHome && !scrolled ? 'var(--text-dark)' : 'white', fontWeight: '700', marginRight: '5px' }}
                         >
                             Đăng nhập
                         </Link>
@@ -86,9 +86,9 @@ const Header = ({ cartCount, onCartClick }) => {
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         aria-label="Menu"
                     >
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 6H20M4 12H20M4 18H20" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
                     </button>
                 </div>
                 {isMenuOpen && <div className="menu-overlay" onClick={() => setIsMenuOpen(false)}></div>}

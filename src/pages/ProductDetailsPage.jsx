@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getProductById } from '../data/products';
+import { useAuth } from '../context/AuthContext';
 
 const ProductDetailsPage = ({ onAddToCart }) => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
+    const { user } = useAuth();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -86,6 +89,15 @@ const ProductDetailsPage = ({ onAddToCart }) => {
                                 Thêm vào giỏ hàng
                             </button>
                             <button
+                                onClick={() => {
+                                    if (!user) {
+                                        alert('Vui lòng đăng nhập để mua hàng!');
+                                        navigate('/login', { state: { from: location.pathname } });
+                                        return;
+                                    }
+                                    onAddToCart(product);
+                                    navigate('/checkout');
+                                }}
                                 className="btn-secondary"
                                 style={{ width: '100%', padding: '20px', fontSize: '1.1rem', borderRadius: '16px' }}
                             >
