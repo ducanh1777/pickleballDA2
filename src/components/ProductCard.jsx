@@ -28,7 +28,7 @@ const ProductCard = ({ product, onAddToCart }) => {
                     <h3 className="product-name">{product.name}</h3>
                     <p className="product-price">{product.price.toLocaleString('vi-VN')} đ</p>
                     <button
-                        className="btn-primary"
+                        className="btn-primary add-to-cart"
                         onClick={(e) => {
                             e.preventDefault();
                             onAddToCart(product);

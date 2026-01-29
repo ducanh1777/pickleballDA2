@@ -1,7 +1,13 @@
-import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Cart = ({ isOpen, onClose, items, onRemove }) => {
     const total = items.reduce((sum, item) => sum + item.price, 0);
+    const navigate = useNavigate();
+
+    const handleCheckout = () => {
+        onClose();
+        navigate('/checkout');
+    };
 
     return (
         <>
@@ -43,7 +49,7 @@ const Cart = ({ isOpen, onClose, items, onRemove }) => {
                             <span>Tổng cộng</span>
                             <span>{total.toLocaleString('vi-VN')} VNĐ</span>
                         </div>
-                        <button className="checkout-btn">Thanh Toán Ngay</button>
+                        <button onClick={handleCheckout} className="checkout-btn">Thanh Toán Ngay</button>
                     </div>
                 )}
             </div>

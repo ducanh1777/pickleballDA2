@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Hero from '../components/Hero';
 import ProductCard from '../components/ProductCard';
-import { products } from '../data/products';
+import { getProducts } from '../data/products';
 import { Link } from 'react-router-dom';
 
 const HomePage = ({ onAddToCart }) => {
-    const featuredProducts = products.slice(0, 4);
+    const [featuredProducts, setFeaturedProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchFeatured = async () => {
+            const data = await getProducts();
+            setFeaturedProducts(data.slice(0, 4));
+            setLoading(false);
+        };
+        fetchFeatured();
+    }, []);
 
     return (
         <div className="home-page">
@@ -22,15 +32,19 @@ const HomePage = ({ onAddToCart }) => {
                     </Link>
                 </div>
 
-                <div className="product-grid">
-                    {featuredProducts.map(product => (
-                        <ProductCard
-                            key={product.id}
-                            product={product}
-                            onAddToCart={onAddToCart}
-                        />
-                    ))}
-                </div>
+                {loading ? (
+                    <div style={{ textAlign: 'center', padding: '40px 0' }}>Đang tải...</div>
+                ) : (
+                    <div className="product-grid">
+                        {featuredProducts.map(product => (
+                            <ProductCard
+                                key={product.id || product._id}
+                                product={product}
+                                onAddToCart={onAddToCart}
+                            />
+                        ))}
+                    </div>
+                )}
             </section>
 
             <section className="promo-banner container animate" style={{ padding: '80px 0' }}>

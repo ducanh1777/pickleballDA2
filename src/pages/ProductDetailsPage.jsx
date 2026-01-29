@@ -1,11 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { products } from '../data/products';
+import { getProductById } from '../data/products';
 
 const ProductDetailsPage = ({ onAddToCart }) => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const product = products.find(p => p.id === parseInt(id));
+    const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProduct = async () => {
+            setLoading(true);
+            const data = await getProductById(id);
+            setProduct(data);
+            setLoading(false);
+        };
+        fetchProduct();
+    }, [id]);
+
+    if (loading) {
+        return <div className="container" style={{ paddingTop: '150px', textAlign: 'center' }}>Đang tải chi tiết sản phẩm...</div>;
+    }
 
     if (!product) {
         return (
@@ -39,7 +54,7 @@ const ProductDetailsPage = ({ onAddToCart }) => {
                             src={product.image}
                             alt={product.name}
                             onError={handleImageError}
-                            style={{ maxWidth: '100%', height: 'auto', borderRadius: '16px', filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.1))' }}
+                            style={{ maxWidth: '100%', height: 'auto', maxHeight: '500px', objectFit: 'contain', borderRadius: '16px', filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.1))' }}
                         />
                     </div>
 

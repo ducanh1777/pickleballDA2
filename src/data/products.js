@@ -1,7 +1,101 @@
+import { db } from '../config/firebase';
+import {
+    collection,
+    getDocs,
+    getDoc,
+    doc,
+    addDoc,
+    setDoc,
+    updateDoc,
+    deleteDoc,
+    query,
+    orderBy
+} from 'firebase/firestore';
+
+const productsRef = collection(db, 'products');
+
+
+export const getProducts = async () => {
+    try {
+        const querySnapshot = await getDocs(productsRef);
+        const data = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        if (data.length === 0) {
+            return products;
+        }
+        // Manual sort by numeric ID if available
+        return data.sort((a, b) => (b.id_numeric || 0) - (a.id_numeric || 0));
+    } catch (error) {
+        console.error('Error fetching products from Firestore:', error);
+        return products;
+    }
+};
+
+export const getProductById = async (id) => {
+    try {
+        const docRef = doc(db, 'products', id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return { id: docSnap.id, ...docSnap.data() };
+        } else {
+            return products.find(p => p.id === parseInt(id));
+        }
+    } catch (error) {
+        console.error('Error fetching product from Firestore:', error);
+        return products.find(p => p.id === parseInt(id));
+    }
+};
+
+export const addProduct = async (productData) => {
+    try {
+        const docRef = await addDoc(productsRef, {
+            ...productData,
+            createdAt: new Date().toISOString(),
+            id_numeric: Date.now() // Use a different field name to avoid confusion with doc.id
+        });
+        return docRef.id;
+    } catch (error) {
+        console.error('Error adding product:', error);
+        throw error;
+    }
+};
+
+export const updateProduct = async (id, productData) => {
+    try {
+        const docRef = doc(db, 'products', String(id));
+        // Use setDoc with merge: true to handle cases where the document might not exist
+        // (e.g., if it was a fallback product being saved for the first time)
+        await setDoc(docRef, {
+            ...productData,
+            updatedAt: new Date().toISOString()
+        }, { merge: true });
+        return true;
+    } catch (error) {
+        console.error('Error updating product:', error);
+        throw error;
+    }
+};
+
+export const deleteProduct = async (id) => {
+    try {
+        const docRef = doc(db, 'products', id);
+        await deleteDoc(docRef);
+        return true;
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        throw error;
+    }
+};
+
 export const products = [
     // --- Vợt (Paddles) ---
     {
         id: 1,
+        // ... (rest of the static data as fallback)
         name: "Selkirk Vanguard Power Air Invikta",
         category: "Vợt (Paddles)",
         brand: "Selkirk",
