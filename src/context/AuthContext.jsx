@@ -65,39 +65,41 @@ export function AuthProvider({ children }) {
     const loginWithGoogle = async () => {
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
+        addLog("Attempting Google Popup...");
         try {
-            if (isMobile) {
-                addLog("Initiating Google Redirect...");
+            const result = await signInWithPopup(auth, provider);
+            addLog("Popup Success: " + result.user.email);
+            await saveUserToFirestore(result.user);
+        } catch (error) {
+            if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
+                addLog("Popup Blocked. Falling back to Redirect...");
                 await signInWithRedirect(auth, provider);
             } else {
-                const result = await signInWithPopup(auth, provider);
-                await saveUserToFirestore(result.user);
+                addLog("Google Error: " + error.code);
+                console.error("Google Login Error:", error);
+                throw error;
             }
-        } catch (error) {
-            addLog("Google Auth Error: " + error.code);
-            console.error("Google Login Error:", error);
-            throw error;
         }
     };
 
     const loginWithFacebook = async () => {
         const provider = new FacebookAuthProvider();
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
+        addLog("Attempting FB Popup...");
         try {
-            if (isMobile) {
-                addLog("Initiating FB Redirect...");
+            const result = await signInWithPopup(auth, provider);
+            addLog("Popup Success: " + result.user.email);
+            await saveUserToFirestore(result.user);
+        } catch (error) {
+            if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
+                addLog("Popup Blocked. Falling back to Redirect...");
                 await signInWithRedirect(auth, provider);
             } else {
-                const result = await signInWithPopup(auth, provider);
-                await saveUserToFirestore(result.user);
+                addLog("FB Error: " + error.code);
+                console.error("Facebook Login Error:", error);
+                throw error;
             }
-        } catch (error) {
-            addLog("FB Auth Error: " + error.code);
-            console.error("Facebook Login Error:", error);
-            throw error;
         }
     };
 
