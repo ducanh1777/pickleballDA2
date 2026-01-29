@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
@@ -10,16 +10,19 @@ const LoginPage = () => {
     const { user, isAdmin, loading: authLoading, login, loginWithGoogle, loginWithFacebook } = useAuth();
     const navigate = useNavigate();
 
+    const location = useLocation();
+
     // Sử dụng useEffect để chuyển hướng khi trạng thái đăng nhập thay đổi và đã settled
     React.useEffect(() => {
         if (user && !authLoading) {
             if (isAdmin) {
                 navigate('/admin');
             } else {
-                navigate('/');
+                const from = location.state?.from || '/';
+                navigate(from, { replace: true });
             }
         }
-    }, [user, isAdmin, authLoading, navigate]);
+    }, [user, isAdmin, authLoading, navigate, location.state]);
 
     const handleSocialLogin = async (provider) => {
         try {

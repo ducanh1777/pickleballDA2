@@ -89,18 +89,26 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         const checkRedirect = async () => {
+            console.log("Checking for redirect result...");
             try {
                 const result = await getRedirectResult(auth);
                 if (result?.user) {
+                    console.log("Redirect success, user found:", result.user.email);
                     await saveUserToFirestore(result.user);
+                } else {
+                    console.log("No redirect result found.");
                 }
             } catch (error) {
-                console.error("Redirect error:", error);
+                console.error("Redirect error details:", error);
+                if (error.code === 'auth/credential-already-in-use') {
+                    alert('Email này đã được sử dụng với một phương thức đăng nhập khác.');
+                }
             }
         };
         checkRedirect();
 
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            console.log("onAuthStateChanged fired. User:", firebaseUser ? firebaseUser.email : "null");
             setLoading(true);
             if (firebaseUser) {
                 try {
@@ -108,19 +116,19 @@ export function AuthProvider({ children }) {
                     const userSnap = await getDoc(userRef);
 
                     if (userSnap.exists() && userSnap.data().status === 'blocked') {
+                        console.warn("User is blocked.");
                         await signOut(auth);
                         setUser(null);
                         alert('Tài khoản của bạn đã bị khóa bởi quản trị viên.');
                     } else {
-                        // Ensure user is in Firestore
+                        console.log("Syncing user with Firestore...");
                         await saveUserToFirestore(firebaseUser);
-
-                        // Set state with roles/status from Firestore if available
                         const updatedSnap = await getDoc(userRef);
                         setUser({
                             ...firebaseUser,
                             ...(updatedSnap.exists() ? updatedSnap.data() : {})
                         });
+                        console.log("User state updated successfully.");
                     }
                 } catch (error) {
                     console.error('Error during auth sync:', error);
@@ -130,6 +138,7 @@ export function AuthProvider({ children }) {
                 setUser(null);
             }
             setLoading(false);
+            console.log("Auth loading finished.");
         });
         return unsubscribe;
     }, []);
@@ -142,7 +151,7 @@ export function AuthProvider({ children }) {
         loginWithGoogle,
         loginWithFacebook,
         isAdmin: user?.role === 'admin' || user?.email === 'admin@pickleball.com',
-        authLoading: loading
+        loading: loading
     };
 
     return (
