@@ -7,7 +7,7 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { user, isAdmin, loading: authLoading, login, loginWithGoogle, loginWithFacebook, refreshRedirect, logs } = useAuth();
+    const { user, isAdmin, loading: authLoading, login, loginWithGoogle, loginWithFacebook } = useAuth();
     const navigate = useNavigate();
 
     const location = useLocation();
@@ -122,27 +122,6 @@ const LoginPage = () => {
                         </button>
                     </div>
 
-                    <div style={{ marginTop: '32px', padding: '20px', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '20px', border: '1px solid rgba(59, 130, 246, 0.1)' }}>
-                        <h4 style={{ color: '#3b82f6', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ fontSize: '1.2rem' }}>💡</span> Hỗ trợ Đăng nhập Mobile
-                        </h4>
-                        <button
-                            onClick={refreshRedirect}
-                            disabled={authLoading}
-                            style={{ width: '100%', padding: '12px', borderRadius: '12px', background: 'white', border: '2px solid #3b82f6', color: '#3b82f6', fontWeight: '700', cursor: 'pointer', transition: '0.3s' }}
-                        >
-                            {authLoading ? '⌛ Đang kiểm tra...' : '🔄 Làm mới trạng thái tài khoản'}
-                        </button>
-
-                        {/* Nhật ký chẩn đoán cho mobile */}
-                        <div style={{ marginTop: '20px', padding: '12px', background: '#0f172a', borderRadius: '12px', color: '#4ade80', fontSize: '0.75rem', fontFamily: 'monospace', maxHeight: '120px', overflowY: 'auto' }}>
-                            <div style={{ borderBottom: '1px solid #334155', paddingBottom: '5px', marginBottom: '5px', color: '#94a3b8', display: 'flex', justifyContent: 'space-between' }}>
-                                <span>DIAGNOSTIC LOGS</span>
-                                <span onClick={() => { navigator.clipboard.writeText(logs.join('\n')); alert('Đã copy log!'); }} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Copy</span>
-                            </div>
-                            {logs && logs.map((log, i) => <div key={i}>{log}</div>)}
-                        </div>
-                    </div>
 
                     <p style={{ textAlign: 'center', marginTop: '24px', color: 'var(--text-muted)' }}>
                         Chưa có tài khoản? <Link to="/register" style={{ color: 'var(--primary)', fontWeight: '700' }}>Đăng ký ngay</Link>

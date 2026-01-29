@@ -20,11 +20,6 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [logs, setLogs] = useState([]);
-
-    const addLog = (msg) => {
-        setLogs(prev => [...prev.slice(-9), `${new Date().toLocaleTimeString()}: ${msg}`]);
-    };
 
     function login(email, password) {
         return signInWithEmailAndPassword(auth, email, password);
@@ -54,11 +49,9 @@ export function AuthProvider({ children }) {
                     status: 'active',
                     createdAt: serverTimestamp()
                 });
-                addLog("New user registered in Firestore");
             }
         } catch (error) {
             console.error('Error saving user to Firestore:', error);
-            addLog("Firestore Sync Error: " + error.code);
         }
     };
 
@@ -66,17 +59,13 @@ export function AuthProvider({ children }) {
         const provider = new GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
 
-        addLog("Attempting Google Popup...");
         try {
             const result = await signInWithPopup(auth, provider);
-            addLog("Popup Success: " + result.user.email);
             await saveUserToFirestore(result.user);
         } catch (error) {
             if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
-                addLog("Popup Blocked. Falling back to Redirect...");
                 await signInWithRedirect(auth, provider);
             } else {
-                addLog("Google Error: " + error.code);
                 console.error("Google Login Error:", error);
                 throw error;
             }
@@ -86,17 +75,13 @@ export function AuthProvider({ children }) {
     const loginWithFacebook = async () => {
         const provider = new FacebookAuthProvider();
 
-        addLog("Attempting FB Popup...");
         try {
             const result = await signInWithPopup(auth, provider);
-            addLog("Popup Success: " + result.user.email);
             await saveUserToFirestore(result.user);
         } catch (error) {
             if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
-                addLog("Popup Blocked. Falling back to Redirect...");
                 await signInWithRedirect(auth, provider);
             } else {
-                addLog("FB Error: " + error.code);
                 console.error("Facebook Login Error:", error);
                 throw error;
             }
@@ -107,33 +92,19 @@ export function AuthProvider({ children }) {
         let isUnsubscribed = false;
 
         const initializeAuth = async () => {
-            addLog("System Init...");
-            addLog("URL: " + window.location.href.split('?')[0].split('#')[0].slice(-20) + "..."); // Shortened URL for log
             setLoading(true);
 
             try {
-                // Check for redirect result
-                addLog("Checking Redirect Result...");
                 const result = await getRedirectResult(auth);
                 if (result?.user) {
-                    addLog("Redirect Success: " + result.user.email);
                     await saveUserToFirestore(result.user);
-                } else {
-                    addLog("No Redirect data found.");
-                    // Check if we have auth params in URL despite getRedirectResult saying no
-                    if (window.location.href.includes('apiKey') || window.location.href.includes('state')) {
-                        addLog("Warning: Auth params found in URL but SDK ignored them!");
-                    }
                 }
             } catch (error) {
-                addLog("Redirect Check Error: " + error.code);
                 console.error("Auth System: Redirect check error:", error);
             }
 
             const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
                 if (isUnsubscribed) return;
-
-                addLog("Auth State: " + (firebaseUser ? firebaseUser.email : "Logged Out"));
 
                 if (firebaseUser) {
                     setUser(firebaseUser);
@@ -145,7 +116,6 @@ export function AuthProvider({ children }) {
                         const userSnap = await getDoc(userRef);
                         if (userSnap.exists()) {
                             if (userSnap.data().status === 'blocked') {
-                                addLog("User Blocked!");
                                 await signOut(auth);
                                 setUser(null);
                             } else {
@@ -153,7 +123,7 @@ export function AuthProvider({ children }) {
                             }
                         }
                     } catch (e) {
-                        addLog("Sync Error: " + e.code);
+                        console.error("Sync Error:", e);
                     }
                 } else {
                     setUser(null);
@@ -182,26 +152,7 @@ export function AuthProvider({ children }) {
         loginWithGoogle,
         loginWithFacebook,
         isAdmin: user?.role === 'admin' || user?.email === 'admin@pickleball.com',
-        loading: loading,
-        logs: logs,
-        refreshRedirect: async () => {
-            addLog("Manual Redirect Check...");
-            setLoading(true);
-            try {
-                const result = await getRedirectResult(auth);
-                if (result?.user) {
-                    addLog("Manual Success: " + result.user.email);
-                    await saveUserToFirestore(result.user);
-                } else {
-                    addLog("Manual: No Result.");
-                    alert('Không tìm thấy thông tin đăng nhập. Hãy thử đăng nhập lại.');
-                }
-            } catch (e) {
-                addLog("Manual Error: " + e.code);
-                alert('Lỗi: ' + e.message);
-            }
-            setLoading(false);
-        }
+        loading: loading
     };
 
     return (
