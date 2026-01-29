@@ -81,11 +81,11 @@ const OrderHistoryPage = () => {
                                         borderRadius: '20px',
                                         fontSize: '0.85rem',
                                         fontWeight: '800',
-                                        background: order.status === 'accepted' ? '#dcfce7' : '#fef9c3',
-                                        color: order.status === 'accepted' ? '#166534' : '#854d0e',
+                                        background: order.status === 'accepted' ? '#dcfce7' : (order.status === 'rejected' ? '#fee2e2' : '#fef9c3'),
+                                        color: order.status === 'accepted' ? '#166534' : (order.status === 'rejected' ? '#991b1b' : '#854d0e'),
                                         boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
                                     }}>
-                                        {order.status === 'accepted' ? '✓ Đã Duyệt' : '⏳ Chờ Xử Lý'}
+                                        {order.status === 'accepted' ? '✓ Đã Duyệt' : (order.status === 'rejected' ? '✕ Từ Chối' : '⏳ Chờ Xử Lý')}
                                     </span>
                                 </div>
 
@@ -108,6 +108,11 @@ const OrderHistoryPage = () => {
                                 {order.status === 'accepted' && (
                                     <div style={{ marginTop: '15px', padding: '12px', background: 'rgba(118, 185, 0, 0.05)', borderRadius: '12px', color: 'var(--primary-dark)', fontSize: '0.9rem', fontWeight: '600' }}>
                                         📢 Thông báo: Đơn hàng của bạn đã được quản trị viên duyệt và đang trong quá trình chuẩn bị giao.
+                                    </div>
+                                )}
+                                {order.status === 'rejected' && (
+                                    <div style={{ marginTop: '15px', padding: '12px', background: 'rgba(239, 68, 68, 0.05)', borderRadius: '12px', color: '#ef4444', fontSize: '0.9rem', fontWeight: '600' }}>
+                                        ✕ Thông báo: Rất tiếc, đơn hàng của bạn không được phê duyệt (có thể do kho hết hàng). Vui lòng liên hệ shop để được hỗ trợ.
                                     </div>
                                 )}
                             </div>

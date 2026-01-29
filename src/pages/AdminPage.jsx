@@ -111,6 +111,19 @@ const AdminPage = () => {
         }
     };
 
+    const handleRejectOrder = async (orderId) => {
+        if (!window.confirm('Bạn có chắc muốn từ chối đơn hàng này?')) return;
+        try {
+            const orderRef = doc(db, 'orders', orderId);
+            await updateDoc(orderRef, { status: 'rejected' });
+            alert('Đã từ chối đơn hàng.');
+            fetchOrders();
+        } catch (error) {
+            console.error('Error rejecting order:', error);
+            alert('Có lỗi xảy ra khi từ chối đơn.');
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -320,20 +333,28 @@ const AdminPage = () => {
                                                         borderRadius: '20px',
                                                         fontSize: '0.75rem',
                                                         fontWeight: '700',
-                                                        background: o.status === 'accepted' ? '#dcfce7' : '#fef9c3',
-                                                        color: o.status === 'accepted' ? '#166534' : '#854d0e'
+                                                        background: o.status === 'accepted' ? '#dcfce7' : (o.status === 'rejected' ? '#fee2e2' : '#fef9c3'),
+                                                        color: o.status === 'accepted' ? '#166534' : (o.status === 'rejected' ? '#991b1b' : '#854d0e')
                                                     }}>
-                                                        {o.status === 'accepted' ? 'Đã duyệt' : 'Chờ xử lý'}
+                                                        {o.status === 'accepted' ? 'Đã duyệt' : (o.status === 'rejected' ? 'Đã từ chối' : 'Chờ xử lý')}
                                                     </span>
                                                 </td>
                                                 <td style={{ padding: '20px' }}>
-                                                    {o.status !== 'accepted' && (
-                                                        <button
-                                                            onClick={() => handleAcceptOrder(o.id)}
-                                                            style={{ background: 'var(--primary)', color: 'white', padding: '6px 12px', borderRadius: '8px', fontWeight: '700', fontSize: '0.85rem' }}
-                                                        >
-                                                            Chấp nhận
-                                                        </button>
+                                                    {(!o.status || o.status === 'pending') && (
+                                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                                            <button
+                                                                onClick={() => handleAcceptOrder(o.id)}
+                                                                style={{ background: 'var(--primary)', color: 'white', padding: '6px 12px', borderRadius: '8px', fontWeight: '700', fontSize: '0.85rem' }}
+                                                            >
+                                                                Duyệt
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleRejectOrder(o.id)}
+                                                                style={{ background: '#ef4444', color: 'white', padding: '6px 12px', borderRadius: '8px', fontWeight: '700', fontSize: '0.85rem' }}
+                                                            >
+                                                                Từ chối
+                                                            </button>
+                                                        </div>
                                                     )}
                                                 </td>
                                             </tr>
