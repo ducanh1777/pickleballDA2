@@ -31,7 +31,7 @@ function AppContent() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   const addToCart = (product) => {
     if (!user) {
