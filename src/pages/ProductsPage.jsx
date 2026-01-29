@@ -42,25 +42,17 @@ const ProductsPage = ({ onAddToCart }) => {
     }, [category]);
 
     return (
-        <div className="products-page" style={{ paddingTop: '120px', minHeight: '100vh' }}>
+        <div className="products-page">
             <div className="container">
                 <div className="products-layout">
-                    <aside className="filters glass" style={{ padding: '24px', borderRadius: '24px', height: 'fit-content', position: 'sticky', top: '100px' }}>
-                        <h3 style={{ marginBottom: '20px', fontWeight: '800' }}>Danh Mục</h3>
-                        <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <aside className="filters glass">
+                        <h3>Danh Mục</h3>
+                        <ul>
                             {categories.map(cat => (
                                 <li key={cat}>
                                     <button
                                         onClick={() => setCategory(cat)}
-                                        style={{
-                                            padding: '8px 16px',
-                                            borderRadius: '8px',
-                                            width: '100%',
-                                            textAlign: 'left',
-                                            fontWeight: '600',
-                                            background: category === cat ? 'var(--primary-dark)' : 'transparent',
-                                            color: category === cat ? 'white' : 'var(--text-muted)'
-                                        }}
+                                        className={category === cat ? 'active' : ''}
                                     >
                                         {cat === 'All' ? 'Tất cả sản phẩm' : cat}
                                     </button>
@@ -70,9 +62,9 @@ const ProductsPage = ({ onAddToCart }) => {
                     </aside>
 
                     <main>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-                            <h2 style={{ fontSize: '2rem', fontWeight: '900' }}>{category === 'All' ? 'Tất cả sản phẩm' : category}</h2>
-                            <p style={{ color: 'var(--text-muted)' }}>Hiển thị {filteredProducts.length} sản phẩm</p>
+                        <div className="products-header">
+                            <h2>{category === 'All' ? 'Tất cả sản phẩm' : category}</h2>
+                            <p>Hiển thị {filteredProducts.length} sản phẩm</p>
                         </div>
 
                         {loading ? (
