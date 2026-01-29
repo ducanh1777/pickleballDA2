@@ -246,29 +246,38 @@ const AdminPage = () => {
                         )}
 
                         <div className="glass" style={{ padding: '0', borderRadius: '32px', overflow: 'hidden' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                                <thead style={{ background: '#f8fafc', fontWeight: '700' }}>
-                                    <tr>
-                                        <th style={{ padding: '20px' }}>Hình ảnh</th>
-                                        <th style={{ padding: '20px' }}>Tên</th>
-                                        <th style={{ padding: '20px' }}>Giá</th>
-                                        <th style={{ padding: '20px' }}>Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {products.slice((pPage - 1) * itemsPerPage, pPage * itemsPerPage).map(p => (
-                                        <tr key={p.id} style={{ borderTop: '1px solid #e2e8f0' }}>
-                                            <td style={{ padding: '15px 20px' }}><img src={p.image} alt="" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px' }} /></td>
-                                            <td style={{ padding: '15px 20px', fontWeight: '600' }}>{p.name}</td>
-                                            <td style={{ padding: '15px 20px' }}>{p.price.toLocaleString('vi-VN')} đ</td>
-                                            <td style={{ padding: '15px 20px' }}>
-                                                <button onClick={() => handleEdit(p)} style={{ color: 'var(--primary-dark)', marginRight: '15px', fontWeight: '700' }}>Sửa</button>
-                                                <button onClick={() => handleDelete(p.id)} style={{ color: '#ef4444', fontWeight: '700' }}>Xóa</button>
-                                            </td>
+                            <div className="table-responsive">
+                                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
+                                    <thead style={{ background: '#f8fafc', fontWeight: '700' }}>
+                                        <tr>
+                                            <th style={{ padding: '20px' }}>Sản phẩm</th>
+                                            <th style={{ padding: '20px' }}>Danh mục</th>
+                                            <th style={{ padding: '20px' }}>Giá</th>
+                                            <th style={{ padding: '20px' }}>Thao tác</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {products.slice((pPage - 1) * itemsPerPage, pPage * itemsPerPage).map(p => (
+                                            <tr key={p.id} style={{ borderTop: '1px solid #e2e8f0' }}>
+                                                <td style={{ padding: '20px' }}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                        <img src={p.image} alt="" style={{ width: '40px', height: '40px', objectFit: 'contain', borderRadius: '8px' }} />
+                                                        <span style={{ fontWeight: '600' }}>{p.name}</span>
+                                                    </div>
+                                                </td>
+                                                <td style={{ padding: '20px', color: 'var(--text-muted)' }}>{p.category}</td>
+                                                <td style={{ padding: '20px', fontWeight: '700' }}>{p.price?.toLocaleString('vi-VN')} đ</td>
+                                                <td style={{ padding: '20px' }}>
+                                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                                        <button onClick={() => handleEdit(p)} style={{ color: 'var(--primary-dark)' }}>Sửa</button>
+                                                        <button onClick={() => handleDelete(p.id)} style={{ color: '#ef4444' }}>Xóa</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         <Pagination
                             currentPage={pPage}
@@ -280,62 +289,63 @@ const AdminPage = () => {
                 ) : activeTab === 'orders' ? (
                     <>
                         <div className="glass" style={{ padding: '0', borderRadius: '32px', overflow: 'hidden' }}>
-                            {/* ... (keep existing orders table) */}
-                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                                <thead style={{ background: '#f8fafc', fontWeight: '700' }}>
-                                    {/* ... same as before ... */}
-                                    <tr>
-                                        <th style={{ padding: '20px' }}>Khách hàng</th>
-                                        <th style={{ padding: '20px' }}>Sản phẩm</th>
-                                        <th style={{ padding: '20px' }}>Tổng tiền</th>
-                                        <th style={{ padding: '20px' }}>Trạng thái</th>
-                                        <th style={{ padding: '20px' }}>Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {orders.slice((oPage - 1) * itemsPerPage, oPage * itemsPerPage).map(o => (
-                                        <tr key={o.id} style={{ borderTop: '1px solid #e2e8f0' }}>
-                                            <td style={{ padding: '20px' }}>
-                                                <div style={{ fontWeight: '700' }}>{o.customerInfo?.name}</div>
-                                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{o.customerInfo?.phone}</div>
-                                            </td>
-                                            <td style={{ padding: '20px' }}>
-                                                {o.items?.map((item, i) => (
-                                                    <div key={i} style={{ fontSize: '0.85rem' }}>• {item.name}</div>
-                                                ))}
-                                            </td>
-                                            <td style={{ padding: '20px', fontWeight: '800', color: 'var(--primary-dark)' }}>{o.total?.toLocaleString('vi-VN')} đ</td>
-                                            <td style={{ padding: '20px' }}>
-                                                <span style={{
-                                                    padding: '4px 10px',
-                                                    borderRadius: '20px',
-                                                    fontSize: '0.75rem',
-                                                    fontWeight: '700',
-                                                    background: o.status === 'accepted' ? '#dcfce7' : '#fef9c3',
-                                                    color: o.status === 'accepted' ? '#166534' : '#854d0e'
-                                                }}>
-                                                    {o.status === 'accepted' ? 'Đã duyệt' : 'Chờ xử lý'}
-                                                </span>
-                                            </td>
-                                            <td style={{ padding: '20px' }}>
-                                                {o.status !== 'accepted' && (
-                                                    <button
-                                                        onClick={() => handleAcceptOrder(o.id)}
-                                                        style={{ background: 'var(--primary)', color: 'white', padding: '6px 12px', borderRadius: '8px', fontWeight: '700', fontSize: '0.85rem' }}
-                                                    >
-                                                        Chấp nhận
-                                                    </button>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {orders.length === 0 && (
+                            <div className="table-responsive">
+                                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
+                                    <thead style={{ background: '#f8fafc', fontWeight: '700' }}>
+                                        {/* ... same as before ... */}
                                         <tr>
-                                            <td colSpan="5" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Chưa có đơn hàng nào.</td>
+                                            <th style={{ padding: '20px' }}>Khách hàng</th>
+                                            <th style={{ padding: '20px' }}>Sản phẩm</th>
+                                            <th style={{ padding: '20px' }}>Tổng tiền</th>
+                                            <th style={{ padding: '20px' }}>Trạng thái</th>
+                                            <th style={{ padding: '20px' }}>Thao tác</th>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {orders.slice((oPage - 1) * itemsPerPage, oPage * itemsPerPage).map(o => (
+                                            <tr key={o.id} style={{ borderTop: '1px solid #e2e8f0' }}>
+                                                <td style={{ padding: '20px' }}>
+                                                    <div style={{ fontWeight: '700' }}>{o.customerInfo?.name}</div>
+                                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{o.customerInfo?.phone}</div>
+                                                </td>
+                                                <td style={{ padding: '20px' }}>
+                                                    {o.items?.map((item, i) => (
+                                                        <div key={i} style={{ fontSize: '0.85rem' }}>• {item.name}</div>
+                                                    ))}
+                                                </td>
+                                                <td style={{ padding: '20px', fontWeight: '800', color: 'var(--primary-dark)' }}>{o.total?.toLocaleString('vi-VN')} đ</td>
+                                                <td style={{ padding: '20px' }}>
+                                                    <span style={{
+                                                        padding: '4px 10px',
+                                                        borderRadius: '20px',
+                                                        fontSize: '0.75rem',
+                                                        fontWeight: '700',
+                                                        background: o.status === 'accepted' ? '#dcfce7' : '#fef9c3',
+                                                        color: o.status === 'accepted' ? '#166534' : '#854d0e'
+                                                    }}>
+                                                        {o.status === 'accepted' ? 'Đã duyệt' : 'Chờ xử lý'}
+                                                    </span>
+                                                </td>
+                                                <td style={{ padding: '20px' }}>
+                                                    {o.status !== 'accepted' && (
+                                                        <button
+                                                            onClick={() => handleAcceptOrder(o.id)}
+                                                            style={{ background: 'var(--primary)', color: 'white', padding: '6px 12px', borderRadius: '8px', fontWeight: '700', fontSize: '0.85rem' }}
+                                                        >
+                                                            Chấp nhận
+                                                        </button>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {orders.length === 0 && (
+                                            <tr>
+                                                <td colSpan="5" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>Chưa có đơn hàng nào.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         <Pagination
                             currentPage={oPage}
@@ -347,53 +357,55 @@ const AdminPage = () => {
                 ) : (
                     <>
                         <div className="glass" style={{ padding: '0', borderRadius: '32px', overflow: 'hidden' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                                <thead style={{ background: '#f8fafc', fontWeight: '700' }}>
-                                    <tr>
-                                        <th style={{ padding: '20px' }}>Email</th>
-                                        <th style={{ padding: '20px' }}>Tên</th>
-                                        <th style={{ padding: '20px' }}>Trạng thái</th>
-                                        <th style={{ padding: '20px' }}>Ngày tạo</th>
-                                        <th style={{ padding: '20px' }}>Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {users.slice((uPage - 1) * itemsPerPage, uPage * itemsPerPage).map(u => (
-                                        <tr key={u.id} style={{ borderTop: '1px solid #e2e8f0' }}>
-                                            <td style={{ padding: '20px', fontWeight: '600' }}>{u.email}</td>
-                                            <td style={{ padding: '20px' }}>{u.displayName || '---'}</td>
-                                            <td style={{ padding: '20px' }}>
-                                                <span style={{
-                                                    padding: '4px 10px',
-                                                    borderRadius: '20px',
-                                                    fontSize: '0.75rem',
-                                                    fontWeight: '700',
-                                                    background: u.status === 'blocked' ? '#fee2e2' : '#dcfce7',
-                                                    color: u.status === 'blocked' ? '#991b1b' : '#166534'
-                                                }}>
-                                                    {u.status === 'blocked' ? 'Đã khóa' : 'Hoạt động'}
-                                                </span>
-                                            </td>
-                                            <td style={{ padding: '20px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                                                {u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString('vi-VN') : '---'}
-                                            </td>
-                                            <td style={{ padding: '20px' }}>
-                                                {u.role !== 'admin' && (
-                                                    <button
-                                                        onClick={() => handleToggleUserStatus(u.id, u.status)}
-                                                        style={{
-                                                            color: u.status === 'blocked' ? '#10b981' : '#ef4444',
-                                                            fontWeight: '700'
-                                                        }}
-                                                    >
-                                                        {u.status === 'blocked' ? 'Mở khóa' : 'Khóa'}
-                                                    </button>
-                                                )}
-                                            </td>
+                            <div className="table-responsive">
+                                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
+                                    <thead style={{ background: '#f8fafc', fontWeight: '700' }}>
+                                        <tr>
+                                            <th style={{ padding: '20px' }}>Email</th>
+                                            <th style={{ padding: '20px' }}>Tên</th>
+                                            <th style={{ padding: '20px' }}>Trạng thái</th>
+                                            <th style={{ padding: '20px' }}>Ngày tạo</th>
+                                            <th style={{ padding: '20px' }}>Thao tác</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {users.slice((uPage - 1) * itemsPerPage, uPage * itemsPerPage).map(u => (
+                                            <tr key={u.id} style={{ borderTop: '1px solid #e2e8f0' }}>
+                                                <td style={{ padding: '20px', fontWeight: '600' }}>{u.email}</td>
+                                                <td style={{ padding: '20px' }}>{u.displayName || '---'}</td>
+                                                <td style={{ padding: '20px' }}>
+                                                    <span style={{
+                                                        padding: '4px 10px',
+                                                        borderRadius: '20px',
+                                                        fontSize: '0.75rem',
+                                                        fontWeight: '700',
+                                                        background: u.status === 'blocked' ? '#fee2e2' : '#dcfce7',
+                                                        color: u.status === 'blocked' ? '#991b1b' : '#166534'
+                                                    }}>
+                                                        {u.status === 'blocked' ? 'Đã khóa' : 'Hoạt động'}
+                                                    </span>
+                                                </td>
+                                                <td style={{ padding: '20px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                                                    {u.createdAt?.toDate ? u.createdAt.toDate().toLocaleDateString('vi-VN') : '---'}
+                                                </td>
+                                                <td style={{ padding: '20px' }}>
+                                                    {u.role !== 'admin' && (
+                                                        <button
+                                                            onClick={() => handleToggleUserStatus(u.id, u.status)}
+                                                            style={{
+                                                                color: u.status === 'blocked' ? '#10b981' : '#ef4444',
+                                                                fontWeight: '700'
+                                                            }}
+                                                        >
+                                                            {u.status === 'blocked' ? 'Mở khóa' : 'Khóa'}
+                                                        </button>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         <Pagination
                             currentPage={uPage}

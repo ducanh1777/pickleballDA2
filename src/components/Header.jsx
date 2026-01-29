@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 const Header = ({ cartCount, onCartClick }) => {
     const { user, logout } = useAuth();
     const [scrolled, setScrolled] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
     const isHome = location.pathname === '/';
 
@@ -32,15 +33,15 @@ const Header = ({ cartCount, onCartClick }) => {
                 <Link to="/" className="logo">
                     <img src={logo} alt="Duc Anh Pickleball" />
                 </Link>
-                <nav>
+                <nav className={`nav ${isMenuOpen ? 'open' : ''}`}>
                     <ul className="nav-links">
-                        <li><Link to="/" style={{ color: !isHome && !scrolled ? 'var(--text-dark)' : undefined }}>Trang chủ</Link></li>
-                        <li><Link to="/products" style={{ color: !isHome && !scrolled ? 'var(--text-dark)' : undefined }}>Sản phẩm</Link></li>
+                        <li><Link to="/" onClick={() => setIsMenuOpen(false)} style={{ color: !isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined }}>Trang chủ</Link></li>
+                        <li><Link to="/products" onClick={() => setIsMenuOpen(false)} style={{ color: !isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined }}>Sản phẩm</Link></li>
                         {useAuth().isAdmin && (
-                            <li><Link to="/admin" style={{ color: location.pathname === '/admin' ? 'var(--primary)' : (!isHome && !scrolled ? 'var(--text-dark)' : undefined), fontWeight: location.pathname === '/admin' ? '900' : '500' }}>Quản trị</Link></li>
+                            <li><Link to="/admin" onClick={() => setIsMenuOpen(false)} style={{ color: location.pathname === '/admin' ? 'var(--primary)' : (!isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined), fontWeight: location.pathname === '/admin' ? '900' : '500' }}>Quản trị</Link></li>
                         )}
-                        <li><Link to="/about" style={{ color: !isHome && !scrolled ? 'var(--text-dark)' : undefined }}>Về chúng tôi</Link></li>
-                        <li><Link to="/contact" style={{ color: !isHome && !scrolled ? 'var(--text-dark)' : undefined }}>Liên hệ</Link></li>
+                        <li><Link to="/about" onClick={() => setIsMenuOpen(false)} style={{ color: !isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined }}>Về chúng tôi</Link></li>
+                        <li><Link to="/contact" onClick={() => setIsMenuOpen(false)} style={{ color: !isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined }}>Liên hệ</Link></li>
                     </ul>
                 </nav>
                 <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
@@ -71,7 +72,19 @@ const Header = ({ cartCount, onCartClick }) => {
                         <span>🛒</span>
                         {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
                     </button>
+                    <button
+                        className={`hamburger ${!isHome && !scrolled ? 'dark' : ''}`}
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        aria-label="Menu"
+                    >
+                        <div className={isMenuOpen ? 'active' : ''}>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </button>
                 </div>
+                {isMenuOpen && <div className="menu-overlay" onClick={() => setIsMenuOpen(false)}></div>}
             </div>
         </header>
     );

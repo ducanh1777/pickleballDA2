@@ -490,7 +490,22 @@ button {
   .about-page,
   .contact-page,
   .product-detail-page {
+    padding-top: 150px;
+    padding-bottom: 100px;
     animation: fadeIn 0.8s ease-out;
+  }
+
+  .products-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 40px;
+  }
+
+  .product-detail-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 60px;
+    align-items: start;
   }
 
   @keyframes fadeIn {
@@ -653,18 +668,172 @@ footer {
   color: var(--primary);
 }
 
+/* Mobile Navigation */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2001;
+}
+
+.hamburger.dark span {
+  background: var(--text-dark);
+}
+
+.hamburger span {
+  width: 100%;
+  height: 3px;
+  background: white;
+  border-radius: 10px;
+  transition: all 0.3s linear;
+  position: relative;
+  transform-origin: 1px;
+}
+
+.hamburger .active span:first-child {
+  transform: rotate(45deg);
+}
+
+.hamburger .active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger .active span:nth-child(3) {
+  transform: rotate(-45deg);
+}
+
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1001;
+}
+
+/* Table Responsiveness */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 16px;
+}
+
 /* Responsive */
+@media (max-width: 992px) {
+  .hero-content {
+    max-width: 90%;
+    padding: 30px;
+  }
+}
+
 @media (max-width: 768px) {
-  .hero-content h1 {
-    font-size: 2.5rem;
+  .hamburger {
+    display: flex;
+  }
+
+  .nav {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    z-index: 2000;
+    transition: 0.4s ease;
+    padding: 100px 40px;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav.open {
+    right: 0;
   }
 
   .nav-links {
+    display: flex !important;
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .nav-links li a {
+    color: var(--text-dark) !important;
+    font-size: 1.2rem;
+    text-shadow: none;
+  }
+
+  .header-actions {
+    gap: 12px !important;
+  }
+
+  .header-actions span {
     display: none;
+    /* Hide welcome text on small screens */
+  }
+
+  .hero-content h1 {
+    font-size: 2.2rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .container {
+    padding: 0 16px;
+  }
+
+  .btn-primary {
+    padding: 14px 24px;
+    font-size: 0.9rem;
   }
 
   .cart-drawer {
     width: 100%;
     right: -100%;
+    padding: 20px;
+  }
+
+  .products-layout,
+  .product-detail-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .product-detail-page h1 {
+    font-size: 2.2rem !important;
+  }
+
+  .product-detail-page div[style*="font-size: 2.5rem"] {
+    font-size: 1.8rem !important;
+  }
+
+  .cart-items {
+    max-height: calc(100vh - 250px);
+  }
+}
+
+@media (max-width: 480px) {
+  .logo img {
+    height: 36px;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-content h1 {
+    font-size: 1.8rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
   }
 }

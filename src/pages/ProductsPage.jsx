@@ -44,7 +44,7 @@ const ProductsPage = ({ onAddToCart }) => {
     return (
         <div className="products-page" style={{ paddingTop: '120px', minHeight: '100vh' }}>
             <div className="container">
-                <div className="products-layout" style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '40px' }}>
+                <div className="products-layout">
                     <aside className="filters glass" style={{ padding: '24px', borderRadius: '24px', height: 'fit-content', position: 'sticky', top: '100px' }}>
                         <h3 style={{ marginBottom: '20px', fontWeight: '800' }}>Danh Mục</h3>
                         <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
