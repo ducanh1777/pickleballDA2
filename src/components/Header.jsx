@@ -8,8 +8,7 @@ const Header = ({ cartCount, onCartClick }) => {
     const { user, logout } = useAuth();
     const [scrolled, setScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const location = useLocation();
-    const isHome = location.pathname === '/';
+    const navigate = useNavigate();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -22,6 +21,8 @@ const Header = ({ cartCount, onCartClick }) => {
     const handleLogout = async () => {
         try {
             await logout();
+            navigate('/');
+            setIsMenuOpen(false);
         } catch (err) {
             console.error('Logout failed', err);
         }
@@ -56,7 +57,7 @@ const Header = ({ cartCount, onCartClick }) => {
                         <li><Link to="/about" onClick={() => setIsMenuOpen(false)} style={{ color: !isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined }}>Về chúng tôi</Link></li>
                         <li><Link to="/contact" onClick={() => setIsMenuOpen(false)} style={{ color: !isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined }}>Liên hệ</Link></li>
                         {user && (
-                            <li className="mobile-only"><button onClick={handleLogout} style={{ background: 'none', border: 'none', color: 'var(--text-dark)', fontWeight: '600', width: '100%', textAlign: 'left', fontSize: '1.2rem', padding: '0' }}>Thoát</button></li>
+                            <li className="mobile-only"><button onClick={handleLogout} style={{ background: 'none', border: 'none', color: 'var(--text-dark)', fontWeight: '600', width: '100%', textAlign: 'left', fontSize: '1.2rem', padding: '10px 0' }}>Đăng xuất</button></li>
                         )}
                         {!user && (
                             <li className="mobile-only"><Link to="/login" onClick={() => setIsMenuOpen(false)}>Đăng nhập</Link></li>
@@ -75,7 +76,7 @@ const Header = ({ cartCount, onCartClick }) => {
                                 onClick={handleLogout}
                                 style={{ background: 'none', border: 'none', color: scrolled || (!isHome && !scrolled) ? 'var(--text-dark)' : 'rgba(255,255,255,0.8)', fontWeight: '600', cursor: 'pointer', fontSize: '0.75rem' }}
                             >
-                                Thoát
+                                Đăng xuất
                             </button>
                         </div>
                     ) : (
