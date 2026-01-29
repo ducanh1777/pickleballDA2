@@ -7,7 +7,7 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { user, isAdmin, loading: authLoading, login, loginWithGoogle, loginWithFacebook, refreshRedirect } = useAuth();
+    const { user, isAdmin, loading: authLoading, login, loginWithGoogle, loginWithFacebook, refreshRedirect, logs } = useAuth();
     const navigate = useNavigate();
 
     const location = useLocation();
@@ -126,9 +126,6 @@ const LoginPage = () => {
                         <h4 style={{ color: '#3b82f6', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <span style={{ fontSize: '1.2rem' }}>💡</span> Hỗ trợ Đăng nhập Mobile
                         </h4>
-                        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6', marginBottom: '15px' }}>
-                            Nếu bạn đã xác nhận Google nhưng vẫn bị kẹt ở đây, hãy thử nhấn nút làm mới bên dưới:
-                        </p>
                         <button
                             onClick={refreshRedirect}
                             disabled={authLoading}
@@ -136,13 +133,14 @@ const LoginPage = () => {
                         >
                             {authLoading ? '⌛ Đang kiểm tra...' : '🔄 Làm mới trạng thái tài khoản'}
                         </button>
-                        <div style={{ marginTop: '15px', fontSize: '0.8rem', color: '#64748b' }}>
-                            <strong>Mẹo:</strong>
-                            <ul style={{ paddingLeft: '18px', marginTop: '5px' }}>
-                                <li>Nếu dùng iPhone, hãy mở bằng <strong>Safari</strong> (không dùng trình duyệt của Zalo/FB).</li>
-                                <li>Tắt <strong>Chế độ ẩn danh</strong> nếu đang bật.</li>
-                                <li>Đảm bảo Safari không chặn <strong>Cookie bên thứ 3</strong>.</li>
-                            </ul>
+
+                        {/* Nhật ký chẩn đoán cho mobile */}
+                        <div style={{ marginTop: '20px', padding: '12px', background: '#0f172a', borderRadius: '12px', color: '#4ade80', fontSize: '0.75rem', fontFamily: 'monospace', maxHeight: '120px', overflowY: 'auto' }}>
+                            <div style={{ borderBottom: '1px solid #334155', paddingBottom: '5px', marginBottom: '5px', color: '#94a3b8', display: 'flex', justifyContent: 'space-between' }}>
+                                <span>DIAGNOSTIC LOGS</span>
+                                <span onClick={() => { navigator.clipboard.writeText(logs.join('\n')); alert('Đã copy log!'); }} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Copy</span>
+                            </div>
+                            {logs && logs.map((log, i) => <div key={i}>{log}</div>)}
                         </div>
                     </div>
 

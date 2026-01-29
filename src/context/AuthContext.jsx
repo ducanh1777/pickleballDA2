@@ -20,6 +20,11 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [logs, setLogs] = useState([]);
+
+    const addLog = (msg) => {
+        setLogs(prev => [...prev.slice(-9), `${new Date().toLocaleTimeString()}: ${msg}`]);
+    };
 
     function login(email, password) {
         return signInWithEmailAndPassword(auth, email, password);
@@ -49,24 +54,29 @@ export function AuthProvider({ children }) {
                     status: 'active',
                     createdAt: serverTimestamp()
                 });
+                addLog("New user registered in Firestore");
             }
         } catch (error) {
             console.error('Error saving user to Firestore:', error);
+            addLog("Firestore Sync Error: " + error.code);
         }
     };
 
     const loginWithGoogle = async () => {
         const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
         try {
             if (isMobile) {
+                addLog("Initiating Google Redirect...");
                 await signInWithRedirect(auth, provider);
             } else {
                 const result = await signInWithPopup(auth, provider);
                 await saveUserToFirestore(result.user);
             }
         } catch (error) {
+            addLog("Google Auth Error: " + error.code);
             console.error("Google Login Error:", error);
             throw error;
         }
@@ -78,12 +88,14 @@ export function AuthProvider({ children }) {
 
         try {
             if (isMobile) {
+                addLog("Initiating FB Redirect...");
                 await signInWithRedirect(auth, provider);
             } else {
                 const result = await signInWithPopup(auth, provider);
                 await saveUserToFirestore(result.user);
             }
         } catch (error) {
+            addLog("FB Auth Error: " + error.code);
             console.error("Facebook Login Error:", error);
             throw error;
         }
@@ -93,57 +105,52 @@ export function AuthProvider({ children }) {
         let isUnsubscribed = false;
 
         const initializeAuth = async () => {
-            console.log("Auth System: Initializing...");
+            addLog("System Init...");
             setLoading(true);
 
             try {
-                // Ensure persistence is set to local
                 await setPersistence(auth, browserLocalPersistence);
-
-                // Check for redirect result BEFORE setting up the listener
-                console.log("Auth System: Checking redirect...");
+                addLog("Checking Redirect Result...");
                 const result = await getRedirectResult(auth);
                 if (result?.user) {
-                    console.log("Auth System: Redirect result found for", result.user.email);
+                    addLog("Redirect Success: " + result.user.email);
                     await saveUserToFirestore(result.user);
+                } else {
+                    addLog("No Redirect data found.");
                 }
             } catch (error) {
+                addLog("Redirect Check Error: " + error.code);
                 console.error("Auth System: Redirect check error:", error);
             }
 
-            // Setup the auth state listener
             const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
                 if (isUnsubscribed) return;
 
-                console.log("Auth System: State changed ->", firebaseUser ? firebaseUser.email : "null");
+                addLog("Auth State: " + (firebaseUser ? firebaseUser.email : "Logged Out"));
 
                 if (firebaseUser) {
-                    // 1. Set basic user IMMEDIATELY so app can proceed
                     setUser(firebaseUser);
                     setLoading(false);
-                    console.log("Auth System: User set basics, loading=false");
 
-                    // 2. Background sync metadata
                     try {
                         await saveUserToFirestore(firebaseUser);
                         const userRef = doc(db, 'users', firebaseUser.uid);
                         const userSnap = await getDoc(userRef);
                         if (userSnap.exists()) {
                             if (userSnap.data().status === 'blocked') {
+                                addLog("User Blocked!");
                                 await signOut(auth);
                                 setUser(null);
-                                alert('Tài khoản bị khóa.');
                             } else {
                                 setUser(prev => ({ ...prev, ...userSnap.data() }));
                             }
                         }
                     } catch (e) {
-                        console.error('Auth System: Background sync failed:', e);
+                        addLog("Sync Error: " + e.code);
                     }
                 } else {
                     setUser(null);
                     setLoading(false);
-                    console.log("Auth System: Settled (User null)");
                 }
             });
 
@@ -169,17 +176,22 @@ export function AuthProvider({ children }) {
         loginWithFacebook,
         isAdmin: user?.role === 'admin' || user?.email === 'admin@pickleball.com',
         loading: loading,
+        logs: logs,
         refreshRedirect: async () => {
+            addLog("Manual Redirect Check...");
             setLoading(true);
             try {
                 const result = await getRedirectResult(auth);
                 if (result?.user) {
+                    addLog("Manual Success: " + result.user.email);
                     await saveUserToFirestore(result.user);
                 } else {
-                    alert('Không tìm thấy thông tin đăng nhập từ Google. Vui lòng thử lại.');
+                    addLog("Manual: No Result.");
+                    alert('Không tìm thấy thông tin đăng nhập. Hãy thử đăng nhập lại.');
                 }
             } catch (e) {
-                alert('Lỗi kiểm tra: ' + e.message);
+                addLog("Manual Error: " + e.code);
+                alert('Lỗi: ' + e.message);
             }
             setLoading(false);
         }
@@ -187,7 +199,7 @@ export function AuthProvider({ children }) {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 }
