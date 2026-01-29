@@ -52,6 +52,23 @@ function AppContent() {
     setCartItems([]);
   };
 
+  if (loading) {
+    return (
+      <div className="splash-screen">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <img
+            src="https://firebasestorage.googleapis.com/v0/b/pickleballda-d560f.firebasestorage.app/o/logo.png?alt=media"
+            alt="Logo"
+            className="splash-logo"
+            onError={(e) => e.target.style.display = 'none'}
+          />
+          <div className="splash-loading-bar"></div>
+          <p style={{ marginTop: '16px', color: 'var(--primary)', fontWeight: '600', fontSize: '1.2rem' }}>Đức Anh Pickleball</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="App">
       <ScrollToTop />

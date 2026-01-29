@@ -21,6 +21,9 @@ const ProductCard = ({ product, onAddToCart }) => {
                         src={product.image}
                         alt={product.name}
                         onError={handleImageError}
+                        loading="lazy"
+                        decoding="async"
+                        onLoad={(e) => e.target.classList.add('loaded')}
                     />
                 </div>
                 <div className="product-info">

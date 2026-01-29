@@ -8,6 +8,8 @@ const Hero = () => {
                 src={heroBg}
                 alt="Pickleball Hero"
                 className="hero-image"
+                loading="eager"
+                fetchpriority="high"
             />
             <div className="container">
                 <div className="hero-content animate">
