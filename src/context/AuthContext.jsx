@@ -118,31 +118,33 @@ export function AuthProvider({ children }) {
                 console.log("Auth System: State changed ->", firebaseUser ? firebaseUser.email : "null");
 
                 if (firebaseUser) {
+                    // 1. Set basic user IMMEDIATELY so app can proceed
+                    setUser(firebaseUser);
+                    setLoading(false);
+                    console.log("Auth System: User set basics, loading=false");
+
+                    // 2. Background sync metadata
                     try {
+                        await saveUserToFirestore(firebaseUser);
                         const userRef = doc(db, 'users', firebaseUser.uid);
                         const userSnap = await getDoc(userRef);
-
-                        if (userSnap.exists() && userSnap.data().status === 'blocked') {
-                            await signOut(auth);
-                            setUser(null);
-                        } else {
-                            await saveUserToFirestore(firebaseUser);
-                            const updatedSnap = await getDoc(userRef);
-                            setUser({
-                                ...firebaseUser,
-                                ...(updatedSnap.exists() ? updatedSnap.data() : {})
-                            });
+                        if (userSnap.exists()) {
+                            if (userSnap.data().status === 'blocked') {
+                                await signOut(auth);
+                                setUser(null);
+                                alert('Tài khoản bị khóa.');
+                            } else {
+                                setUser(prev => ({ ...prev, ...userSnap.data() }));
+                            }
                         }
-                    } catch (error) {
-                        console.error('Auth System: Firestore sync error:', error);
-                        setUser(firebaseUser);
+                    } catch (e) {
+                        console.error('Auth System: Background sync failed:', e);
                     }
                 } else {
                     setUser(null);
+                    setLoading(false);
+                    console.log("Auth System: Settled (User null)");
                 }
-
-                setLoading(false);
-                console.log("Auth System: Settled");
             });
 
             return unsubscribe;
@@ -166,7 +168,21 @@ export function AuthProvider({ children }) {
         loginWithGoogle,
         loginWithFacebook,
         isAdmin: user?.role === 'admin' || user?.email === 'admin@pickleball.com',
-        loading: loading
+        loading: loading,
+        refreshRedirect: async () => {
+            setLoading(true);
+            try {
+                const result = await getRedirectResult(auth);
+                if (result?.user) {
+                    await saveUserToFirestore(result.user);
+                } else {
+                    alert('Không tìm thấy thông tin đăng nhập từ Google. Vui lòng thử lại.');
+                }
+            } catch (e) {
+                alert('Lỗi kiểm tra: ' + e.message);
+            }
+            setLoading(false);
+        }
     };
 
     return (
