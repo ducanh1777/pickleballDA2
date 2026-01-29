@@ -47,17 +47,18 @@ const Header = ({ cartCount, onCartClick }) => {
                         )}
                         <li><Link to="/" onClick={() => setIsMenuOpen(false)} style={{ color: !isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined }}>Trang chủ</Link></li>
                         <li><Link to="/products" onClick={() => setIsMenuOpen(false)} style={{ color: !isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined }}>Sản phẩm</Link></li>
-                        {useAuth().isAdmin && (
+                        {user?.role === 'admin' && (
                             <li><Link to="/admin" onClick={() => setIsMenuOpen(false)} style={{ color: location.pathname === '/admin' ? 'var(--primary)' : (!isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined), fontWeight: location.pathname === '/admin' ? '900' : '500' }}>Quản trị</Link></li>
+                        )}
+                        {user && (
+                            <li><Link to="/my-orders" onClick={() => setIsMenuOpen(false)} style={{ color: !isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined }}>Đơn hàng</Link></li>
                         )}
                         <li><Link to="/about" onClick={() => setIsMenuOpen(false)} style={{ color: !isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined }}>Về chúng tôi</Link></li>
                         <li><Link to="/contact" onClick={() => setIsMenuOpen(false)} style={{ color: !isHome && !scrolled && !isMenuOpen ? 'var(--text-dark)' : undefined }}>Liên hệ</Link></li>
                         {user && (
-                            <li className="mobile-only"><Link to="/my-orders" onClick={() => setIsMenuOpen(false)}>Đơn hàng của tôi</Link></li>
-                        )}
-                        {user ? (
                             <li className="mobile-only"><button onClick={handleLogout} style={{ background: 'none', border: 'none', color: 'var(--text-dark)', fontWeight: '600', width: '100%', textAlign: 'left', fontSize: '1.2rem', padding: '0' }}>Thoát</button></li>
-                        ) : (
+                        )}
+                        {!user && (
                             <li className="mobile-only"><Link to="/login" onClick={() => setIsMenuOpen(false)}>Đăng nhập</Link></li>
                         )}
                     </ul>
@@ -65,17 +66,14 @@ const Header = ({ cartCount, onCartClick }) => {
                 <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     {user ? (
                         <div className="mobile-hide" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                            <Link to="/my-orders" style={{ fontSize: '0.9rem', fontWeight: '700', color: !isHome && !scrolled ? 'var(--text-dark)' : 'white' }}>
-                                Đơn hàng của tôi
-                            </Link>
                             <div className="user-badge" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 14px', background: !isHome && !scrolled ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)', borderRadius: '20px', border: '1px solid currentColor' }}>
-                                <span style={{ fontSize: '0.85rem', fontWeight: '800', color: !isHome && !scrolled ? 'var(--text-dark)' : 'white' }}>
-                                    👋 {user.displayName || user.email.split('@')[0]}
+                                <span style={{ fontSize: '0.8rem', fontWeight: '700', color: !isHome && !scrolled ? 'var(--text-dark)' : 'white' }}>
+                                    Hi, {user.displayName?.split(' ').pop() || user.email.split('@')[0]}
                                 </span>
                             </div>
                             <button
                                 onClick={handleLogout}
-                                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontWeight: '600', cursor: 'pointer', fontSize: '0.8rem' }}
+                                style={{ background: 'none', border: 'none', color: !isHome && !scrolled ? 'var(--text-muted)' : 'rgba(255,255,255,0.7)', fontWeight: '600', cursor: 'pointer', fontSize: '0.75rem' }}
                             >
                                 Thoát
                             </button>
@@ -83,8 +81,8 @@ const Header = ({ cartCount, onCartClick }) => {
                     ) : (
                         <Link
                             to="/login"
-                            className="login-link-header"
-                            style={{ color: !isHome && !scrolled ? 'var(--text-dark)' : 'white', fontWeight: '700', marginRight: '5px' }}
+                            className="login-link-header mobile-hide"
+                            style={{ color: !isHome && !scrolled ? 'var(--text-dark)' : 'white', fontWeight: '700' }}
                         >
                             Đăng nhập
                         </Link>

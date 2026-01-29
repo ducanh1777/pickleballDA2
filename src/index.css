@@ -147,6 +147,25 @@ button {
   animation: fadeIn 0.8s ease-out forwards;
 }
 
+/* Visibility Utilities */
+.mobile-only {
+  display: none !important;
+}
+
+.mobile-hide {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: block !important;
+  }
+
+  .mobile-hide {
+    display: none !important;
+  }
+}
+
 /* Header */
 .header {
   position: fixed;
@@ -878,18 +897,6 @@ footer {
 
   .header-actions {
     gap: 12px !important;
-  }
-
-  .mobile-hide {
-    display: none !important;
-  }
-
-  .mobile-hide {
-    display: none !important;
-  }
-
-  .mobile-only {
-    display: block !important;
   }
 
   .login-link-header {
