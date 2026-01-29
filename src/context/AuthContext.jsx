@@ -1,10 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import {
+    signInWithPopup,
+    GoogleAuthProvider,
+    FacebookAuthProvider,
+    onAuthStateChanged,
+    signOut,
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged,
-    signInWithPopup
+    signInWithRedirect,
+    getRedirectResult
 } from 'firebase/auth';
 import { auth, googleProvider, facebookProvider, db } from '../config/firebase';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
@@ -25,14 +29,6 @@ export function AuthProvider({ children }) {
 
     function logout() {
         return signOut(auth);
-    }
-
-    function loginWithGoogle() {
-        return signInWithPopup(auth, googleProvider);
-    }
-
-    function loginWithFacebook() {
-        return signInWithPopup(auth, facebookProvider);
     }
 
     const saveUserToFirestore = async (user) => {
@@ -57,13 +53,58 @@ export function AuthProvider({ children }) {
         }
     };
 
+    const loginWithGoogle = async () => {
+        const provider = new GoogleAuthProvider();
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+        try {
+            if (isMobile) {
+                await signInWithRedirect(auth, provider);
+            } else {
+                const result = await signInWithPopup(auth, provider);
+                await saveUserToFirestore(result.user);
+            }
+        } catch (error) {
+            console.error("Google Login Error:", error);
+            throw error;
+        }
+    };
+
+    const loginWithFacebook = async () => {
+        const provider = new FacebookAuthProvider();
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+        try {
+            if (isMobile) {
+                await signInWithRedirect(auth, provider);
+            } else {
+                const result = await signInWithPopup(auth, provider);
+                await saveUserToFirestore(result.user);
+            }
+        } catch (error) {
+            console.error("Facebook Login Error:", error);
+            throw error;
+        }
+    };
+
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-            setLoading(true); // Ensure loading is true while we verify the user
-            if (currentUser) {
+        const checkRedirect = async () => {
+            try {
+                const result = await getRedirectResult(auth);
+                if (result?.user) {
+                    await saveUserToFirestore(result.user);
+                }
+            } catch (error) {
+                console.error("Redirect error:", error);
+            }
+        };
+        checkRedirect();
+
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            setLoading(true);
+            if (firebaseUser) {
                 try {
-                    // Check if user is blocked in Firestore
-                    const userRef = doc(db, 'users', currentUser.uid);
+                    const userRef = doc(db, 'users', firebaseUser.uid);
                     const userSnap = await getDoc(userRef);
 
                     if (userSnap.exists() && userSnap.data().status === 'blocked') {
@@ -71,26 +112,19 @@ export function AuthProvider({ children }) {
                         setUser(null);
                         alert('Tài khoản của bạn đã bị khóa bởi quản trị viên.');
                     } else {
-                        // Success - user is not blocked
-                        setUser(currentUser);
-                        // Record login/sign-up
-                        const syncRef = doc(db, 'users', currentUser.uid);
-                        const syncSnap = await getDoc(syncRef);
-                        if (!syncSnap.exists()) {
-                            await setDoc(syncRef, {
-                                uid: currentUser.uid,
-                                email: currentUser.email,
-                                displayName: currentUser.displayName || '',
-                                photoURL: currentUser.photoURL || '',
-                                role: currentUser.email === 'admin@pickleball.com' ? 'admin' : 'user',
-                                status: 'active',
-                                createdAt: serverTimestamp()
-                            });
-                        }
+                        // Ensure user is in Firestore
+                        await saveUserToFirestore(firebaseUser);
+
+                        // Set state with roles/status from Firestore if available
+                        const updatedSnap = await getDoc(userRef);
+                        setUser({
+                            ...firebaseUser,
+                            ...(updatedSnap.exists() ? updatedSnap.data() : {})
+                        });
                     }
                 } catch (error) {
                     console.error('Error during auth sync:', error);
-                    setUser(currentUser); // Fallback to allow login if Firestore fails
+                    setUser(firebaseUser);
                 }
             } else {
                 setUser(null);
@@ -107,7 +141,8 @@ export function AuthProvider({ children }) {
         logout,
         loginWithGoogle,
         loginWithFacebook,
-        isAdmin: user?.email === 'admin@pickleball.com' // Simple admin check for now
+        isAdmin: user?.role === 'admin' || user?.email === 'admin@pickleball.com',
+        authLoading: loading
     };
 
     return (
