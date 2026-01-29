@@ -43,7 +43,7 @@ const Header = ({ cartCount, onCartClick }) => {
                                 <div style={{ padding: '20px', background: 'rgba(118, 185, 0, 0.1)', borderRadius: '16px', marginBottom: '10px' }}>
                                     <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', display: 'block' }}>Xin chào,</span>
                                     <span style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--primary)' }}>
-                                        {user.displayName || user.email.split('@')[0]} 👋
+                                        {user.displayName || (user.email ? user.email.split('@')[0] : 'Tài khoản')} 👋
                                     </span>
                                 </div>
                             </li>
@@ -71,7 +71,7 @@ const Header = ({ cartCount, onCartClick }) => {
                         <div className="mobile-hide" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                             <div className="user-badge" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 14px', background: !isHome && !scrolled ? 'rgba(0,0,0,0.05)' : (scrolled ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)'), borderRadius: '20px', border: scrolled || (!isHome && !scrolled) ? '1px solid var(--text-dark)' : '1px solid white' }}>
                                 <span style={{ fontSize: '0.8rem', fontWeight: '700', color: scrolled || (!isHome && !scrolled) ? 'var(--text-dark)' : 'white' }}>
-                                    Hi, {user.displayName?.split(' ').pop() || user.email.split('@')[0]}
+                                    Hi, {user.displayName?.split(' ').pop() || (user.email ? user.email.split('@')[0] : 'bạn')}
                                 </span>
                             </div>
                             <button
@@ -106,7 +106,7 @@ const Header = ({ cartCount, onCartClick }) => {
                 </div>
                 {isMenuOpen && <div className="menu-overlay" onClick={() => setIsMenuOpen(false)}></div>}
             </div>
-        </header>
+        </header >
     );
 };
 
