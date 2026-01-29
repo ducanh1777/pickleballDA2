@@ -8,7 +8,9 @@ import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     signInWithRedirect,
-    getRedirectResult
+    getRedirectResult,
+    setPersistence,
+    browserLocalPersistence
 } from 'firebase/auth';
 import { auth, googleProvider, facebookProvider, db } from '../config/firebase';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
@@ -88,59 +90,72 @@ export function AuthProvider({ children }) {
     };
 
     useEffect(() => {
-        const checkRedirect = async () => {
-            console.log("Checking for redirect result...");
+        let isUnsubscribed = false;
+
+        const initializeAuth = async () => {
+            console.log("Auth System: Initializing...");
+            setLoading(true);
+
             try {
+                // Ensure persistence is set to local
+                await setPersistence(auth, browserLocalPersistence);
+
+                // Check for redirect result BEFORE setting up the listener
+                console.log("Auth System: Checking redirect...");
                 const result = await getRedirectResult(auth);
                 if (result?.user) {
-                    console.log("Redirect success, user found:", result.user.email);
+                    console.log("Auth System: Redirect result found for", result.user.email);
                     await saveUserToFirestore(result.user);
-                } else {
-                    console.log("No redirect result found.");
                 }
             } catch (error) {
-                console.error("Redirect error details:", error);
-                if (error.code === 'auth/credential-already-in-use') {
-                    alert('Email này đã được sử dụng với một phương thức đăng nhập khác.');
-                }
+                console.error("Auth System: Redirect check error:", error);
             }
-        };
-        checkRedirect();
 
-        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-            console.log("onAuthStateChanged fired. User:", firebaseUser ? firebaseUser.email : "null");
-            setLoading(true);
-            if (firebaseUser) {
-                try {
-                    const userRef = doc(db, 'users', firebaseUser.uid);
-                    const userSnap = await getDoc(userRef);
+            // Setup the auth state listener
+            const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+                if (isUnsubscribed) return;
 
-                    if (userSnap.exists() && userSnap.data().status === 'blocked') {
-                        console.warn("User is blocked.");
-                        await signOut(auth);
-                        setUser(null);
-                        alert('Tài khoản của bạn đã bị khóa bởi quản trị viên.');
-                    } else {
-                        console.log("Syncing user with Firestore...");
-                        await saveUserToFirestore(firebaseUser);
-                        const updatedSnap = await getDoc(userRef);
-                        setUser({
-                            ...firebaseUser,
-                            ...(updatedSnap.exists() ? updatedSnap.data() : {})
-                        });
-                        console.log("User state updated successfully.");
+                console.log("Auth System: State changed ->", firebaseUser ? firebaseUser.email : "null");
+
+                if (firebaseUser) {
+                    try {
+                        const userRef = doc(db, 'users', firebaseUser.uid);
+                        const userSnap = await getDoc(userRef);
+
+                        if (userSnap.exists() && userSnap.data().status === 'blocked') {
+                            await signOut(auth);
+                            setUser(null);
+                        } else {
+                            await saveUserToFirestore(firebaseUser);
+                            const updatedSnap = await getDoc(userRef);
+                            setUser({
+                                ...firebaseUser,
+                                ...(updatedSnap.exists() ? updatedSnap.data() : {})
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Auth System: Firestore sync error:', error);
+                        setUser(firebaseUser);
                     }
-                } catch (error) {
-                    console.error('Error during auth sync:', error);
-                    setUser(firebaseUser);
+                } else {
+                    setUser(null);
                 }
-            } else {
-                setUser(null);
-            }
-            setLoading(false);
-            console.log("Auth loading finished.");
-        });
-        return unsubscribe;
+
+                setLoading(false);
+                console.log("Auth System: Settled");
+            });
+
+            return unsubscribe;
+        };
+
+        const authPromise = initializeAuth();
+
+        return () => {
+            isUnsubscribed = true;
+            authPromise.then(unsubscribe => {
+                if (typeof unsubscribe === 'function') unsubscribe();
+            });
+        };
     }, []);
 
     const value = {

@@ -15,11 +15,12 @@ const LoginPage = () => {
     // Sử dụng useEffect để chuyển hướng khi trạng thái đăng nhập thay đổi và đã settled
     React.useEffect(() => {
         if (user && !authLoading) {
+            console.log("Login Page: User detected, navigating away...");
             if (isAdmin) {
                 navigate('/admin');
             } else {
                 const from = location.state?.from || '/';
-                navigate(from, { replace: true });
+                navigate(from);
             }
         }
     }, [user, isAdmin, authLoading, navigate, location.state]);
@@ -56,6 +57,12 @@ const LoginPage = () => {
             <div className="container" style={{ maxWidth: '500px' }}>
                 <div className="glass" style={{ padding: '40px', borderRadius: '32px' }}>
                     <h2 style={{ textAlign: 'center', marginBottom: '32px', fontWeight: '900' }}>Đăng Nhập</h2>
+
+                    {authLoading && (
+                        <div style={{ textAlign: 'center', margin: '20px 0', color: 'var(--primary)', fontWeight: '600' }}>
+                            🔄 Đang kiểm tra tài khoản...
+                        </div>
+                    )}
 
                     {error && <div style={{ background: '#fee2e2', color: '#dc2626', padding: '12px', borderRadius: '8px', marginBottom: '20px', fontSize: '0.9rem' }}>{error}</div>}
 
