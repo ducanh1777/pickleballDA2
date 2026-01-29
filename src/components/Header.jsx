@@ -73,15 +73,13 @@ const Header = ({ cartCount, onCartClick }) => {
                         {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
                     </button>
                     <button
-                        className={`hamburger ${scrolled || !isHome ? 'dark' : ''}`}
+                        className={`hamburger ${scrolled || !isHome ? 'dark' : ''} ${isMenuOpen ? 'active' : ''}`}
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                         aria-label="Menu"
                     >
-                        <div className={isMenuOpen ? 'active' : ''}>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
+                        <span></span>
+                        <span></span>
+                        <span></span>
                     </button>
                 </div>
                 {isMenuOpen && <div className="menu-overlay" onClick={() => setIsMenuOpen(false)}></div>}
